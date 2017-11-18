@@ -29,8 +29,14 @@ def parseTree(s):
             new_s += '{"' + word[1:] + '": ['
         else:
             new_s += '"' + word.replace(')','') + '"' + ']}, ' * word.count(')')
+<<<<<<< HEAD
     new_s = new_s[:-2].replace(', }', '}')
     # print new_s
     bracketCount = 0
     tree = eval(new_s)
+=======
+
+    tree = eval(new_s[:-2].replace(', }', '}'))
+
+>>>>>>> 5f868e1e2dcb099acd2c5d93a59ef84be771b4cb
     return tree
