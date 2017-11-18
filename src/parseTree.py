@@ -18,7 +18,6 @@ def rec(line):
 def parseTree(s):
     s = [x.strip() for x in s.replace('\r\n', ' ').split(' ')
         if x]
-    print s
 
     new_s =''
     for word in s:
@@ -26,8 +25,7 @@ def parseTree(s):
             new_s += '{"' + word[1:] + '": ['
         else:
             new_s += '"' + word.replace(')','') + '"' + ']}, ' * word.count(')')
-    new_s = new_s[:-2].replace(', }', '}')
-    print new_s
-    bracketCount = 0
-    tree = eval(new_s)
+
+    tree = eval(new_s[:-2].replace(', }', '}'))
+
     return tree
