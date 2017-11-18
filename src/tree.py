@@ -14,21 +14,8 @@ for line in sentences:
       'annotators': 'tokenize,ssplit,pos,depparse,parse',
       'outputFormat': 'json'
       })
-    # print(output['sentences'][0]['parse'])
-    # pp.pprint(output['sentences'])
+    # pp.pprint(output['sentences'][0])
     sampleTree = output['sentences'][0]['parse']
     print parseTree(sampleTree)
 
     # print "\n"
-
-# text = (
-#   'Pusheen and Smitha walked along the beach. '
-#   'Pusheen wanted to surf, but fell off the surfboard.')
-# output = nlp.annotate(text, properties={
-#   'annotators': 'tokenize,ssplit,pos,depparse,parse',
-#   'outputFormat': 'json'
-#   })
-#
-#
-# print(output['sentences'][0]['parse'])
-# pp.pprint(output)
