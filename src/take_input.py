@@ -2,6 +2,11 @@
 
 import os
 
+INPUT_FILES = [
+    "../Lexicons/nokia-neg.txt",
+    "../Lexicons/nokia-pos.txt"
+]
+
 class InputReader( object ):
     """This class reads sentences from input text files."""
 
@@ -36,11 +41,6 @@ class InputReader( object ):
         return data
 
 if __name__ == "__main__":
-
-    input_files = [
-        "../Lexicons/nokia-neg.txt",
-        "../Lexicons/nokia-pos.txt"
-    ]
 
     # Print all sentences
     for line in InputReader(input_files).read():
