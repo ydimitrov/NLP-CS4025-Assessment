@@ -1,3 +1,5 @@
+import pprint
+
 def rec(line):
     # print line
     if len(line) == 1:
@@ -16,9 +18,10 @@ def rec(line):
     return dictionary
 
 def parseTree(s):
+    pp = pprint.PrettyPrinter(indent=4)
+    # pp.pprint(s)
     s = [x.strip() for x in s.replace('\r\n', ' ').split(' ')
         if x]
-    print s
 
     new_s =''
     for word in s:
@@ -27,7 +30,7 @@ def parseTree(s):
         else:
             new_s += '"' + word.replace(')','') + '"' + ']}, ' * word.count(')')
     new_s = new_s[:-2].replace(', }', '}')
-    print new_s
+    # print new_s
     bracketCount = 0
     tree = eval(new_s)
     return tree
