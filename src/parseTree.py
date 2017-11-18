@@ -33,7 +33,3 @@ def parseTree(s):
     bracketCount = 0
     tree = eval(new_s)
     return tree
-
-if __name__ == "__main__":
-    s = '(ROOT\r\n  (S\r\n    (NP (NNP Sam))\r\n    (VP (VBZ eats)\r\n      (NP (JJ red) (NN meat)))\r\n    (. .)))'
-    print parseTree(s)
