@@ -1,5 +1,3 @@
-import json
-
 def rec(line):
     # print line
     if len(line) == 1:
