@@ -5,7 +5,7 @@ pp = pprint.PrettyPrinter(indent=4)
 
 nlp = StanfordCoreNLP('http://localhost:9000')
 
-sentences = open("nokia-neg.txt", "r")
+sentences = open("../Lexicons/nokia-neg.txt", "r")
 for line in sentences:
     print line.strip()
     text = (line)
