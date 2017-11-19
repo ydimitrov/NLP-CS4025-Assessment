@@ -9,14 +9,15 @@ with open('../Lexicons/positive-words.txt', 'r') as f:
 with open('../Lexicons/negative-words.txt', 'r') as f:
     neg_words = [line.strip() for line in f]
 
-np = ['NN', 'NNS', 'NNP', 'NNPS', 'WP', 'NP', 'PRP']
+np = ['NN', 'NNS', 'NNP', 'NNPS', 'WP', 'NP', 'PRP','S']
 adj = ['JJ', 'JJR', 'JJS']
 adv = ['RB', 'RBR', 'RBS', 'WRB']
 det = ['DT', 'RPR$', 'WP$']
-v = ['VB','VBD','VBG','VBN','VBP','VBZ']
+v = ['VB','VBD','VBG','VBN','VBP','VBZ','VP']
 p = ['IN']
 
-def applyRules(partOfSpeech1, sentiment1, partOfSpeech2, sentiment2, headPos):
+def applyRules(partOfSpeech1, sentiment1, partOfSpeech2, sentiment2, headPos, head, dependent):
+    # print 'Will start applying the rules on: ', partOfSpeech1, " ", head, " ", sentiment1, ' and ', partOfSpeech2," ", dependent, " ", sentiment2
     print 'Will start applying the rules on: ', partOfSpeech1, sentiment1, ' and ', partOfSpeech2, sentiment2
     if sentiment1 == sentiment2:
         return sentiment1
@@ -53,7 +54,7 @@ def applyRules(partOfSpeech1, sentiment1, partOfSpeech2, sentiment2, headPos):
 
     # print 'Will start applying the rules on: ', partOfSpeech1, sentiment1, ' and ', partOfSpeech2, sentiment2
 
-    if headPos == 0: #partOfSpeech2 is head (post-head)
+    if headPos == 1: #partOfSpeech2 is head (post-head)
         if partOfSpeech2 == 'NP' and (partOfSpeech1 == 'ADJ' or partOfSpeech1 == 'VP'):
             return sentiment1
         if partOfSpeech2 == 'ADJ' and partOfSpeech1 == 'PP':
@@ -86,43 +87,28 @@ def getSentiment(sentence, dependencies, stype):
 			sentiment = "-"
 		else:
 			sentiment = "="
-		# print sentence, sentiment, stype
 		return sentence, sentiment, stype
 
     n = ''
     t = '='
-    # print stype
 
     for key in sentence:
         headKey = key
-        # print "key of sentence = ", key
         for x in range(len(sentence[key])-1, -1, -1):
-            # print "headKey before entering getSentiment() = ", headKey
-            # print "entering getSentiment with ", sentence[key][x], "dependencies, ", headKey
             m, e, key62  = getSentiment(sentence[key][x], dependencies, headKey)
-            # print "m:       " + m
-            # print "key62:   " + key62
             if n == '':
                 n = m
                 t = e
                 headKey = key62
-                # print "headKey: " + headKey
             else:
                 for d in dependencies:
-                    # print d['governorGloss'], ' ?= ', n , d['dependentGloss'], ' ?= ', m
                     if d['governorGloss'] == n and d['dependentGloss'] == m:
                         m = n
-                        e = applyRules(headKey, t, key62, e, 1)
-                        # print "e = ", e
-                        # e = t
-                        # print "headKey before: ", headKey
-                        # print "headKey = key62 ", key62
-                        headKey = key62
+                        e = applyRules(headKey, t, key62, e, 1,m,n)
                     if d['governorGloss'] == m and d['dependentGloss'] == n:
-                        e = applyRules(headKey, t, key62, e, 0)
-                        # print "e = ", e
-            # print '================================================='
-        # print "headKey: " + headKey + " key62: " + key62
+                        e = applyRules(headKey, t, key62, e, 0,n,m)
+                        headKey = key62
+        headKey = key
     return m, e, headKey
 
 
@@ -137,8 +123,8 @@ if __name__ == "__main__":
     output = nlp.annotate(
         # text=InputReader(INPUT_FILES).read()[0],  # Use only the 1st
         # text = 'Clinton defeated Dole',
-        # text = 'Sam eats red meat',
-        text = 'the senators supporting the leader failed to praise his hopeless HIV prevention program',
+        text = 'there is much which has been said in other reviews about the features of this phone , it is a great phone , mine worked without any problems right out of the box . '.lower(),
+        # text = 'the senators supporting the leader failed to praise his hopeless HIV prevention program',
         properties={
           'annotators': 'tokenize,ssplit,pos,depparse,parse',
           'outputFormat': 'json'
