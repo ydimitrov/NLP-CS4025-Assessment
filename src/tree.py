@@ -47,7 +47,7 @@ def getSentiment(sentence, dependencies, stype):
                     if d['governorGloss'] == n and d['dependentGloss'] == m:
                         m = n
                         e = t
-                        # headKey = 
+                        headKey = key62
                         # print "headKey: " + headKey
                         # print "headKey: " + headKey + " key62: " + key62
             print '================================================='
