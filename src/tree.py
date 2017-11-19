@@ -3,25 +3,47 @@ import pprint
 
 from parseTree import parseTree
 from take_input import InputReader, INPUT_FILES
+with open('../Lexicons/positive-words.txt', 'r') as f:
+    pos_words = [line.strip() for line in f]
+
+with open('../Lexicons/negative-words.txt', 'r') as f:
+    neg_words = [line.strip() for line in f]
+
+
+def applyRules(partOfSpeech1, sentiment1, partOfSpeech2, sentiment2):
+
+	print "Applying the rules"
 
 def getSentiment(sentence, dependencies):
     pp.pprint(sentence)
     if type(sentence) is str:
-        return sentence
+		if sentence in pos_words:
+			sentiment = "+"
+		elif sentence in neg_words:
+			sentiment = "-"
+		else:
+			sentiment = "="
+		return sentence, sentiment
+    		
     n = ''
+    t = '='
 
     for key in sentence:
-        for x in range(len(sentence[key]),0,-1):
-            m = getSentiment(sentence[key][x-1], dependencies)
+        for x in range(len(sentence[key])-1, -1, -1):
+            m, e = getSentiment(sentence[key][x], dependencies)
+            print key -1
+            print e
             if n == '':
                 n = m
+                t = e
             else:
                 for d in dependencies:
                     print d['governorGloss'], ' ?= ', n , d['dependentGloss'], ' ?= ', m
                     if d['governorGloss'] == n and d['dependentGloss'] == m:
                         m = n
+                        e = t
             print '================================================='
-    return m
+    return m, e
 
 
 
@@ -50,5 +72,6 @@ if __name__ == "__main__":
         # pp.pprint(output['sentences'][0]['basicDependencies'])
         finalTree = parseTree(sampleTree)
         # pp.pprint(finalTree)
-        head = getSentiment(finalTree, output['sentences'][0]['basicDependencies'])
+        head,e = getSentiment(finalTree, output['sentences'][0]['basicDependencies'])
         print head
+        print e
