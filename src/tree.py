@@ -1,6 +1,11 @@
 from pycorenlp import StanfordCoreNLP
 import pprint
 
+import sys
+reload(sys)
+sys.setdefaultencoding("utf-8")
+
+
 from parseTree import parseTree
 from take_input import InputReader, INPUT_FILES
 with open('../Lexicons/positive-words.txt', 'r') as f:
@@ -15,11 +20,17 @@ with open('../Lexicons/nokia-pos.txt', 'r') as f:
 with open('../Lexicons/nokia-neg.txt', 'r') as f:
     nokia_neg = [line.strip() for line in f]
 
+# k = open('../Lexicons/rt-polarity-pos.txt', 'r')
+# rt_pos = [line.decode('utf-8').split('\n') for line in k.readlines()]
+
+# k = open('../Lexicons/rt-polarity-neg.txt', 'r')
+# rt_neg = [line.decode('utf-8').split('\n') for line in k.readlines()]
+
 with open('../Lexicons/rt-polarity-pos.txt', 'r') as f:
-    rt_pos = [line.strip() for line in f]
+    rt_pos = [line.strip().decode('utf-8','ignore').encode("utf-8") for line in f]
 
 with open('../Lexicons/rt-polarity-neg.txt', 'r') as f:
-    rt_neg = [line.strip() for line in f]
+    rt_neg = [line.strip().decode('utf-8','ignore').encode("utf-8") for line in f]
 
 np = ['NN', 'NNS', 'NNP', 'NNPS', 'WP', 'NP', 'PRP','S']
 adj = ['JJ', 'JJR', 'JJS','ADJP']
@@ -188,6 +199,8 @@ if __name__ == "__main__":
     #             countPos += 1
 
     for x in rt_neg:
+    	count += 1
+        print "Sentence ", count
         output = nlp.annotate(
             text = x.lower(),
             properties={
@@ -209,6 +222,8 @@ if __name__ == "__main__":
             # print types
 
     for x in rt_pos:
+    	count += 1
+        print "Sentence ", count
         output = nlp.annotate(
             text = x.lower(),
             properties={
