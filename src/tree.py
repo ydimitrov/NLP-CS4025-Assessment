@@ -132,59 +132,19 @@ if __name__ == "__main__":
 
     nlp = StanfordCoreNLP('http://localhost:9000')
 
-    print len(nokia_neg)
-    print len(nokia_pos)
+    # print len(nokia_neg)
+    # print len(nokia_pos)
+
+    print len(rt_neg)
+    print len(rt_pos)
 
     countNeg = 0
     countPos = 0
     count = 0
 
-    for x in nokia_neg:
-        count += 1
-        print "Sentence ", count
-        output = nlp.annotate(
-            text = x.lower(),
-            properties={
-              'annotators': 'tokenize,ssplit,pos,depparse,parse',
-              'outputFormat': 'json'
-            }
-        )
-        if "CoreNLP request timed out" in output:
-            print("CoreNLP request timed out. Your document may be too long.")
-        else:
-            sampleTree = output['sentences'][0]['parse']
-            finalTree = parseTree(sampleTree)
-            # pp.pprint(finalTree)
-            head,e, types = getSentiment(finalTree, output['sentences'][0]['basicDependencies'], 'ROOT' )
-            # print head
-            # print 'final sentiment: ', e
-            if e == '-':
-                countNeg += 1
-            # print types
-
-    for x in nokia_pos:
-        count += 1
-        print "Sentence ", count
-        output = nlp.annotate(
-            text = x.lower(),
-            properties={
-              'annotators': 'tokenize,ssplit,pos,depparse,parse',
-              'outputFormat': 'json'
-            }
-        )
-        if "CoreNLP request timed out" in output:
-            print("CoreNLP request timed out. Your document may be too long.")
-        else:
-            sampleTree = output['sentences'][0]['parse']
-            finalTree = parseTree(sampleTree)
-            # pp.pprint(finalTree)
-            head,e, types = getSentiment(finalTree, output['sentences'][0]['basicDependencies'], 'ROOT' )
-            # print head
-            # print 'final sentiment: ', e
-            if e == '+':
-                countPos += 1
-
-    # for x in rt_neg:
+    # for x in nokia_neg:
+    #     count += 1
+    #     print "Sentence ", count
     #     output = nlp.annotate(
     #         text = x.lower(),
     #         properties={
@@ -205,7 +165,9 @@ if __name__ == "__main__":
     #             countNeg += 1
     #         # print types
     #
-    # for x in rt_pos:
+    # for x in nokia_pos:
+    #     count += 1
+    #     print "Sentence ", count
     #     output = nlp.annotate(
     #         text = x.lower(),
     #         properties={
@@ -225,12 +187,57 @@ if __name__ == "__main__":
     #         if e == '+':
     #             countPos += 1
 
+    for x in rt_neg:
+        output = nlp.annotate(
+            text = x.lower(),
+            properties={
+              'annotators': 'tokenize,ssplit,pos,depparse,parse',
+              'outputFormat': 'json'
+            }
+        )
+        if "CoreNLP request timed out" in output:
+            print("CoreNLP request timed out. Your document may be too long.")
+        else:
+            sampleTree = output['sentences'][0]['parse']
+            finalTree = parseTree(sampleTree)
+            # pp.pprint(finalTree)
+            head,e, types = getSentiment(finalTree, output['sentences'][0]['basicDependencies'], 'ROOT' )
+            # print head
+            # print 'final sentiment: ', e
+            if e == '-':
+                countNeg += 1
+            # print types
+
+    for x in rt_pos:
+        output = nlp.annotate(
+            text = x.lower(),
+            properties={
+              'annotators': 'tokenize,ssplit,pos,depparse,parse',
+              'outputFormat': 'json'
+            }
+        )
+        if "CoreNLP request timed out" in output:
+            print("CoreNLP request timed out. Your document may be too long.")
+        else:
+            sampleTree = output['sentences'][0]['parse']
+            finalTree = parseTree(sampleTree)
+            # pp.pprint(finalTree)
+            head,e, types = getSentiment(finalTree, output['sentences'][0]['basicDependencies'], 'ROOT' )
+            # print head
+            # print 'final sentiment: ', e
+            if e == '+':
+                countPos += 1
+
     print "negative correct", countNeg
     print "positive correct", countPos
-    print 'negative reviews:  ', len(nokia_neg)
-    print 'positive reviews:  ', len(nokia_pos)
-    print 'percent n correct: ', float(countNeg/float(len(nokia_neg)))
-    print 'percent p correct: ', float(countPos/float(len(nokia_pos)))
+    print 'negative reviews:  ', len(rt_neg)
+    print 'positive reviews:  ', len(rt_pos)
+    print 'percent n correct: ', float(countNeg/float(len(rt_neg)))
+    print 'percent p correct: ', float(countPos/float(len(rt_pos)))
+    # print 'negative reviews:  ', len(nokia_neg)
+    # print 'positive reviews:  ', len(nokia_pos)
+    # print 'percent n correct: ', float(countNeg/float(len(nokia_neg)))
+    # print 'percent p correct: ', float(countPos/float(len(nokia_pos)))
 
     # output = nlp.annotate(
     #     # text=InputReader(INPUT_FILES).read()[0],  # Use only the 1st
