@@ -9,6 +9,12 @@ with open('../Lexicons/positive-words.txt', 'r') as f:
 with open('../Lexicons/negative-words.txt', 'r') as f:
     neg_words = [line.strip() for line in f]
 
+with open('../Lexicons/nokia-pos.txt', 'r') as f:
+    nokia_pos = [line.strip() for line in f]
+
+with open('../Lexicons/nokia-neg.txt', 'r') as f:
+    nokia_neg = [line.strip() for line in f]
+
 np = ['NN', 'NNS', 'NNP', 'NNPS', 'WP', 'NP', 'PRP','S']
 adj = ['JJ', 'JJR', 'JJS']
 adv = ['RB', 'RBR', 'RBS', 'WRB']
@@ -16,9 +22,9 @@ det = ['DT', 'RPR$', 'WP$']
 v = ['VB','VBD','VBG','VBN','VBP','VBZ','VP']
 p = ['IN']
 
-def applyRules(partOfSpeech1, sentiment1, partOfSpeech2, sentiment2, headPos, head, dependent):
+def applyRules(partOfSpeech1, sentiment1, partOfSpeech2, sentiment2, headPos):
     # print 'Will start applying the rules on: ', partOfSpeech1, " ", head, " ", sentiment1, ' and ', partOfSpeech2," ", dependent, " ", sentiment2
-    print 'Will start applying the rules on: ', partOfSpeech1, sentiment1, ' and ', partOfSpeech2, sentiment2
+    # print 'Will start applying the rules on: ', partOfSpeech1, sentiment1, ' and ', partOfSpeech2, sentiment2
     if sentiment1 == sentiment2:
         return sentiment1
     if sentiment1 == '=':
@@ -54,7 +60,7 @@ def applyRules(partOfSpeech1, sentiment1, partOfSpeech2, sentiment2, headPos, he
 
     # print 'Will start applying the rules on: ', partOfSpeech1, sentiment1, ' and ', partOfSpeech2, sentiment2
 
-    if headPos == 1: #partOfSpeech2 is head (post-head)
+    if headPos == 'pre-head': #partOfSpeech2 is head (pre-head)
         if partOfSpeech2 == 'NP' and (partOfSpeech1 == 'ADJ' or partOfSpeech1 == 'VP'):
             return sentiment1
         if partOfSpeech2 == 'ADJ' and partOfSpeech1 == 'PP':
@@ -65,7 +71,7 @@ def applyRules(partOfSpeech1, sentiment1, partOfSpeech2, sentiment2, headPos, he
             return sentiment2
         if partOfSpeech2 == 'NP' and (partOfSpeech1 == 'NP' or partOfSpeech1 == 'PP'):
             return sentiment2
-    else: #partOfSpeech1 is head (pre-head)
+    else: #partOfSpeech1 is head (post-head)
          if (partOfSpeech2 == 'DET' or partOfSpeech2 == 'ADJ' or partOfSpeech2 == 'VP') and partOfSpeech1 == 'NP':
              return sentiment2
          if (partOfSpeech2 == 'DET' or partOfSpeech2 == 'PP' or partOfSpeech2 == 'ADV') and partOfSpeech1 == 'ADJ':
@@ -104,9 +110,9 @@ def getSentiment(sentence, dependencies, stype):
                 for d in dependencies:
                     if d['governorGloss'] == n and d['dependentGloss'] == m:
                         m = n
-                        e = applyRules(headKey, t, key62, e, 1,m,n)
+                        e = applyRules(headKey, t, key62, e, 'pre-head')
                     if d['governorGloss'] == m and d['dependentGloss'] == n:
-                        e = applyRules(headKey, t, key62, e, 0,n,m)
+                        e = applyRules(headKey, t, key62, e, 'post-head')
                         headKey = key62
         headKey = key
     return m, e, headKey
@@ -120,26 +126,78 @@ if __name__ == "__main__":
 
     nlp = StanfordCoreNLP('http://localhost:9000')
 
-    output = nlp.annotate(
-        # text=InputReader(INPUT_FILES).read()[0],  # Use only the 1st
-        # text = 'Clinton defeated Dole',
-        text = 'there is much which has been said in other reviews about the features of this phone , it is a great phone , mine worked without any problems right out of the box . '.lower(),
-        # text = 'the senators supporting the leader failed to praise his hopeless HIV prevention program',
-        properties={
-          'annotators': 'tokenize,ssplit,pos,depparse,parse',
-          'outputFormat': 'json'
-        }
-    )
-    types = ''
-    if "CoreNLP request timed out" in output:
-        print("CoreNLP request timed out. Your document may be too long.")
-    else:
-        sampleTree = output['sentences'][0]['parse']
-        # pp.pprint(output['sentences'][0]['parse'])
-        # pp.pprint(output['sentences'][0]['basicDependencies'])
-        finalTree = parseTree(sampleTree)
-        pp.pprint(finalTree)
-        head,e, types = getSentiment(finalTree, output['sentences'][0]['basicDependencies'], 'ROOT' )
-        print head
-        print 'final sentiment: ', e
-        print types
+    print len(nokia_neg)
+    print len(nokia_pos)
+
+    countNeg = 0
+    countPos = 0
+
+    for x in nokia_neg:
+        output = nlp.annotate(
+            text = x.lower(),
+            properties={
+              'annotators': 'tokenize,ssplit,pos,depparse,parse',
+              'outputFormat': 'json'
+            }
+        )
+        if "CoreNLP request timed out" in output:
+            print("CoreNLP request timed out. Your document may be too long.")
+        else:
+            sampleTree = output['sentences'][0]['parse']
+            finalTree = parseTree(sampleTree)
+            # pp.pprint(finalTree)
+            head,e, types = getSentiment(finalTree, output['sentences'][0]['basicDependencies'], 'ROOT' )
+            # print head
+            # print 'final sentiment: ', e
+            if e == '-':
+                countNeg += 1
+            # print types
+
+    for x in nokia_neg:
+        output = nlp.annotate(
+            text = x.lower(),
+            properties={
+              'annotators': 'tokenize,ssplit,pos,depparse,parse',
+              'outputFormat': 'json'
+            }
+        )
+        if "CoreNLP request timed out" in output:
+            print("CoreNLP request timed out. Your document may be too long.")
+        else:
+            sampleTree = output['sentences'][0]['parse']
+            finalTree = parseTree(sampleTree)
+            # pp.pprint(finalTree)
+            head,e, types = getSentiment(finalTree, output['sentences'][0]['basicDependencies'], 'ROOT' )
+            # print head
+            # print 'final sentiment: ', e
+            if e == '+':
+                countPos += 1
+
+    print "negative correct", countNeg
+    print "positive correct", countPos
+    print 'negative reviews:  ', len(nokia_neg)
+    print 'positive reviews:  ', len(nokia_pos)
+    print 'percent n correct: ', float(countNeg/float(len(nokia_neg)))
+    print 'percent p correct: ', float(countPos/float(len(nokia_pos)))
+
+    # output = nlp.annotate(
+    #     # text=InputReader(INPUT_FILES).read()[0],  # Use only the 1st
+    #     # text = 'Clinton defeated Dole',
+    #     text = 'there is much which has been said in other reviews about the features of this phone , it is a great phone , mine worked without any problems right out of the box . '.lower(),
+    #     # text = 'the senators supporting the leader failed to praise his hopeless HIV prevention program',
+    #     properties={
+    #       'annotators': 'tokenize,ssplit,pos,depparse,parse',
+    #       'outputFormat': 'json'
+    #     }
+    # )
+    # types = ''
+    # if "CoreNLP request timed out" in output:
+    #     print("CoreNLP request timed out. Your document may be too long.")
+    # else:
+    #     sampleTree = output['sentences'][0]['parse']
+    #     finalTree = parseTree(sampleTree)
+    #     pp.pprint(finalTree)
+    #     head,e, types = getSentiment(finalTree, output['sentences'][0]['basicDependencies'], 'ROOT' )
+    #     print head
+    #     print 'final sentiment: ', e
+    #     print types
