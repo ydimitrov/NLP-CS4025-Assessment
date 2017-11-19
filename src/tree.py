@@ -15,8 +15,14 @@ with open('../Lexicons/nokia-pos.txt', 'r') as f:
 with open('../Lexicons/nokia-neg.txt', 'r') as f:
     nokia_neg = [line.strip() for line in f]
 
+with open('../Lexicons/rt-polarity-pos.txt', 'r') as f:
+    rt_pos = [line.strip() for line in f]
+
+with open('../Lexicons/rt-polarity-neg.txt', 'r') as f:
+    rt_neg = [line.strip() for line in f]
+
 np = ['NN', 'NNS', 'NNP', 'NNPS', 'WP', 'NP', 'PRP','S']
-adj = ['JJ', 'JJR', 'JJS']
+adj = ['JJ', 'JJR', 'JJS','ADJP']
 adv = ['RB', 'RBR', 'RBS', 'WRB']
 det = ['DT', 'RPR$', 'WP$']
 v = ['VB','VBD','VBG','VBN','VBP','VBZ','VP']
@@ -131,8 +137,11 @@ if __name__ == "__main__":
 
     countNeg = 0
     countPos = 0
+    count = 0
 
     for x in nokia_neg:
+        count += 1
+        print "Sentence ", count
         output = nlp.annotate(
             text = x.lower(),
             properties={
@@ -153,7 +162,9 @@ if __name__ == "__main__":
                 countNeg += 1
             # print types
 
-    for x in nokia_neg:
+    for x in nokia_pos:
+        count += 1
+        print "Sentence ", count
         output = nlp.annotate(
             text = x.lower(),
             properties={
@@ -172,6 +183,47 @@ if __name__ == "__main__":
             # print 'final sentiment: ', e
             if e == '+':
                 countPos += 1
+
+    # for x in rt_neg:
+    #     output = nlp.annotate(
+    #         text = x.lower(),
+    #         properties={
+    #           'annotators': 'tokenize,ssplit,pos,depparse,parse',
+    #           'outputFormat': 'json'
+    #         }
+    #     )
+    #     if "CoreNLP request timed out" in output:
+    #         print("CoreNLP request timed out. Your document may be too long.")
+    #     else:
+    #         sampleTree = output['sentences'][0]['parse']
+    #         finalTree = parseTree(sampleTree)
+    #         # pp.pprint(finalTree)
+    #         head,e, types = getSentiment(finalTree, output['sentences'][0]['basicDependencies'], 'ROOT' )
+    #         # print head
+    #         # print 'final sentiment: ', e
+    #         if e == '-':
+    #             countNeg += 1
+    #         # print types
+    #
+    # for x in rt_pos:
+    #     output = nlp.annotate(
+    #         text = x.lower(),
+    #         properties={
+    #           'annotators': 'tokenize,ssplit,pos,depparse,parse',
+    #           'outputFormat': 'json'
+    #         }
+    #     )
+    #     if "CoreNLP request timed out" in output:
+    #         print("CoreNLP request timed out. Your document may be too long.")
+    #     else:
+    #         sampleTree = output['sentences'][0]['parse']
+    #         finalTree = parseTree(sampleTree)
+    #         # pp.pprint(finalTree)
+    #         head,e, types = getSentiment(finalTree, output['sentences'][0]['basicDependencies'], 'ROOT' )
+    #         # print head
+    #         # print 'final sentiment: ', e
+    #         if e == '+':
+    #             countPos += 1
 
     print "negative correct", countNeg
     print "positive correct", countPos
