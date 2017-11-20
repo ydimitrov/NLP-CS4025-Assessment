@@ -16,6 +16,64 @@ Positive reviews:  193
 Percent n correct: 29.7848101266
 Percent p correct: 15.689119171
 
+Analyzer 1 - Some Changes
+===========================
+Nokia negative:  79
+Nokia positive:  193
+Nokia True Negative:  21
+Nokia True Positive:  100
+Nokia False Negative:  7
+Nokia False Positive:  23
+Nokia Negative - Neutral: 35
+Nokia Positive - Neutral: 85
+Accuracy:  0.801324503311
+Precision (Pos):  0.813008130081
+Recall (Pos):  0.934579439252
+F-score (Pos):  0.869565217391
+Precision (Neg):  0.75
+Recall (Neg):  0.477272727273
+F-score (Neg):  0.583333333333
+Percent n correct:  0.26582278481
+Percent p correct:  0.518134715026
+=======================================
+RT negative:  5331
+RT positive:  5331
+RT True Negative:  1545
+RT True Positive:  1931
+RT False Negative:  780
+RT False Positive:  970
+RT Negative - Neutral: 2813
+RT Positive - Neutral: 2614
+Accuracy:  0.665135859166
+Precision (Pos):  0.665632540503
+Recall (Pos):  0.712283290299
+F-score (Pos):  0.688168210976
+Precision (Neg):  0.664516129032
+Recall (Neg):  0.6143141153082
+F-score (Neg):  0.6384297520659
+Percent n correct:  0.289814293754
+Percent p correct:  0.362220971675
+=======================================
+Total negative:  5410
+Total positive:  5524
+Total True Negative:  1566
+Total True Positive:  2031
+Total False Negative:  787
+Total False Positive:  993
+Total Negative - Neutral: 2848
+Total Positive - Neutral: 2699
+Accuracy:  0.668960386833
+Precision (Pos):  0.671626984127
+Recall (Pos):  0.720723917672
+F-score (Pos):  0.695309825402
+Precision (Neg):  0.665533361666
+Recall (Neg):  0.611957796014
+F-score (Neg):  0.637622149837
+Percent n correct:  0.289463955638
+Percent p correct:  0.367668356264
+=======================================
+
+
 Analyzer 2
 ===========================
 
