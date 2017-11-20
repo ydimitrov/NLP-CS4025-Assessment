@@ -2,22 +2,22 @@ import time
 
 from pycorenlp import StanfordCoreNLP
 
-with open('../Lexicons/positive-words.txt', 'r') as f:
+with open('Lexicons/positive-words.txt', 'r') as f:
     pos_words = [line.strip() for line in f]
 
-with open('../Lexicons/negative-words.txt', 'r') as f:
+with open('Lexicons/negative-words.txt', 'r') as f:
     neg_words = [line.strip() for line in f]
 
-with open('../Lexicons/nokia-pos.txt', 'r') as f:
+with open('Lexicons/nokia-pos.txt', 'r') as f:
     nokia_pos = [line.strip() for line in f]
 
-with open('../Lexicons/nokia-neg.txt', 'r') as f:
+with open('Lexicons/nokia-neg.txt', 'r') as f:
     nokia_neg = [line.strip() for line in f]
 
-with open('../Lexicons/rt-polarity-pos.txt', 'r') as f:
+with open('Lexicons/rt-polarity-pos.txt', 'r') as f:
     rt_pos = [line.strip().decode('utf-8','ignore').encode("utf-8") for line in f]
 
-with open('../Lexicons/rt-polarity-neg.txt', 'r') as f:
+with open('Lexicons/rt-polarity-neg.txt', 'r') as f:
     rt_neg = [line.strip().decode('utf-8','ignore').encode("utf-8") for line in f]
 
 def applyRules(partOfSpeech1, sentiment1, partOfSpeech2, sentiment2, headPos):
