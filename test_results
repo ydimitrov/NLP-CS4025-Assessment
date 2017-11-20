@@ -1,3 +1,5 @@
+Analyzer 1
+===========================
 Negative correct:  2353
 Positive correct:  3028
 
@@ -13,4 +15,37 @@ Positive reviews:  193
 
 Percent n correct: 29.7848101266
 Percent p correct: 15.689119171
+
+Analyzer 2
+===========================
+
+Total (Pos): 5524
+Correct (Pos): 2559
+Incorrect (Pos): 2965
+Accuracy (Pos): 0.46325126719768284
+Precision (Pos): 0.6840417000801925
+Recall (Pos): 0.46325126719768284
+F-Measure (Pos): 0.5524015110631408
+
+
+Total (Neg): 5410
+Correct (Neg): 1925
+Incorrect (Neg): 3485
+Accuracy (Neg): 0.355822550831793
+Precision (Neg): 0.26762129848463784
+Recall (Neg): 0.355822550831793
+F-Measure (Neg): 0.3054828215504245
+
+
+==============================
+Naive Bayes
+==============================
+Nokia   (All Data,  Naive Bayes)     Accuracy (All)=0.60 (163/273)
+
+Nokia   (All Data,  Naive Bayes)     Precision (Pos)=0.79 (112/141)
+Nokia   (All Data,  Naive Bayes)     Recall (Pos)=0.58 (112/193)
+Nokia   (All Data,  Naive Bayes)     F-measure (Pos)=0.67
+Nokia   (All Data,  Naive Bayes)     Precision (Neg)=0.39 (51/132)
+Nokia   (All Data,  Naive Bayes)     Recall (Neg)=0.64 (51/80)
+Nokia   (All Data,  Naive Bayes)     F-measure (Neg)=0.48
 
