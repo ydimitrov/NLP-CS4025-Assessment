@@ -49,3 +49,12 @@ Nokia   (All Data,  Naive Bayes)     Precision (Neg)=0.39 (51/132)
 Nokia   (All Data,  Naive Bayes)     Recall (Neg)=0.64 (51/80)
 Nokia   (All Data,  Naive Bayes)     F-measure (Neg)=0.48
 
+
+Films  (Test Data, Naive Bayes)  Accuracy (All)=0.78 (824/1058)
+
+Films  (Test Data, Naive Bayes)  Precision (Pos)=0.76 (395/523)
+Films  (Test Data, Naive Bayes)  Recall (Pos)=0.79 (395/501)
+Films  (Test Data, Naive Bayes)  F-measure (Pos)=0.77
+Films  (Test Data, Naive Bayes)  Precision (Neg)=0.80 (429/535)
+Films  (Test Data, Naive Bayes)  Recall (Neg)=0.77 (429/557)
+Films  (Test Data, Naive Bayes)  F-measure (Neg)=0.79
