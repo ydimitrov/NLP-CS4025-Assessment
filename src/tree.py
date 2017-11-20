@@ -1,8 +1,7 @@
-from pycorenlp import StanfordCoreNLP
-import pprint
+import time
 
-from parseTree import parseTree
-from take_input import InputReader, INPUT_FILES
+from pycorenlp import StanfordCoreNLP
+
 with open('../Lexicons/positive-words.txt', 'r') as f:
     pos_words = [line.strip() for line in f]
 
@@ -15,92 +14,80 @@ with open('../Lexicons/nokia-pos.txt', 'r') as f:
 with open('../Lexicons/nokia-neg.txt', 'r') as f:
     nokia_neg = [line.strip() for line in f]
 
-# with open('../Lexicons/rt-polarity-pos.txt', 'r') as f:
-#     rt_pos = [line.strip().decode('utf-8','ignore').encode("utf-8") for line in f]
+with open('../Lexicons/rt-polarity-pos.txt', 'r') as f:
+    rt_pos = [line.strip().decode('utf-8','ignore').encode("utf-8") for line in f]
 
-# with open('../Lexicons/rt-polarity-neg.txt', 'r') as f:
-#     rt_neg = [line.strip().decode('utf-8','ignore').encode("utf-8") for line in f]
-
-np = ['NN', 'NNS', 'NNP', 'NNPS', 'WP', 'NP', 'PRP','S','SBAR']
-adj = ['JJ', 'JJR', 'JJS','ADJP']
-adv = ['RB', 'RBR', 'RBS', 'WRB']
-det = ['DT', 'RPR$', 'WP$']
-v = ['VB','VBD','VBG','VBN','VBP','VBZ','VP']
-p = ['IN','PP']
+with open('../Lexicons/rt-polarity-neg.txt', 'r') as f:
+    rt_neg = [line.strip().decode('utf-8','ignore').encode("utf-8") for line in f]
 
 def applyRules(partOfSpeech1, sentiment1, partOfSpeech2, sentiment2, headPos):
-    # print 'Will start applying the rules on: ', partOfSpeech1, " ", head, " ", sentiment1, ' and ', partOfSpeech2," ", dependent, " ", sentiment2
-    # print 'Will start applying the rules on: ', partOfSpeech1, sentiment1, ' and ', partOfSpeech2, sentiment2
+
+    poc = {
+        'NP': ['NN', 'NNS', 'NNP', 'NNPS', 'WP', 'NP', 'PRP','S','SBAR'],
+        'ADJ': ['JJ', 'JJR', 'JJS','ADJP'],
+        'ADV': ['RB', 'RBR', 'RBS', 'WRB'],
+        'DET': ['DT', 'RPR$', 'WP$'],
+        'VP': ['VB','VBD','VBG','VBN','VBP','VBZ','VP'],
+        'PP': ['IN','PP'],
+    }
+
     if sentiment1 == sentiment2:
         return sentiment1
+
     if sentiment1 == '=':
-        print sentiment2
         return sentiment2
     if sentiment2 == '=':
         return sentiment1
 
-    if partOfSpeech1 in np:
-        partOfSpeech1 = 'NP'
-    elif partOfSpeech1 in adj:
-        partOfSpeech1 = 'ADJ'
-    elif partOfSpeech1 in adv:
-        partOfSpeech1 = 'ADV'
-    elif partOfSpeech1 in det:
-        partOfSpeech1 = 'DET'
-    elif partOfSpeech1 in v:
-        partOfSpeech1 = 'VP'
-    elif partOfSpeech1 in p:
-        partOfSpeech1 = 'PP'
+    for annotation in poc:
+        if partOfSpeech2 in poc[annotation]:
+            partOfSpeech1 = annotation
+        if partOfSpeech2 in poc[annotation]:
+            partOfSpeech2 = annotation
 
-    if partOfSpeech2 in np:
-        partOfSpeech2 = 'NP'
-    elif partOfSpeech2 in adj:
-        partOfSpeech2 = 'ADJ'
-    elif partOfSpeech2 in adv:
-        partOfSpeech2 = 'ADV'
-    elif partOfSpeech2 in det:
-        partOfSpeech2 = 'DET'
-    elif partOfSpeech2 in v:
-        partOfSpeech2 = 'VP'
-    elif partOfSpeech2 in p:
-        partOfSpeech2 = 'PP'
-
-    # print 'Will start applying the rules on: ', partOfSpeech1, sentiment1, ' and ', partOfSpeech2, sentiment2
-
-    if headPos == 'pre-head': #partOfSpeech2 is head (pre-head)
-        if partOfSpeech2 == 'NP' and (partOfSpeech1 == 'ADJ' or partOfSpeech1 == 'VP'):
+    if headPos == 'pre-head':
+        if partOfSpeech2 == 'NP' and partOfSpeech1 in ['ADJ', 'VP']:
             return sentiment1
-        if partOfSpeech2 == 'ADJ' and partOfSpeech1 == 'PP':
+        if ( (partOfSpeech2 == 'ADJ' and partOfSpeech1 == 'PP')
+                or (partOfSpeech2 == 'ADV' and partOfSpeech1 == 'PP')
+                or (partOfSpeech2 == 'PP' and partOfSpeech1 in ['NP', 'VP'])
+                or (partOfSpeech2 == 'NP' and partOfSpeech1 in ['NP', 'PP']) ):
+
             return sentiment2
-        if partOfSpeech2 == 'ADV' and partOfSpeech1 == 'PP':
+
+    else:
+        if ( (partOfSpeech1 == 'NP' and partOfSpeech2 in ['DET', 'ADJ', 'VP'])
+                 or (partOfSpeech1 == 'ADJ' and partOfSpeech2 in ['DET', 'ADV', 'PP'])
+                 or (partOfSpeech1 == 'PP' and partOfSpeech2 in ['ADV', 'NP'])
+                 or (partOfSpeech2 == 'NP' and partOfSpeech1 == 'NP') ):
+
             return sentiment2
-        if partOfSpeech2 == 'PP' and (partOfSpeech1 == 'NP' or partOfSpeech1 == 'VP'):
-            return sentiment2
-        if partOfSpeech2 == 'NP' and (partOfSpeech1 == 'NP' or partOfSpeech1 == 'PP'):
-            return sentiment2
-    else: #partOfSpeech1 is head (post-head)
-         if (partOfSpeech2 == 'DET' or partOfSpeech2 == 'ADJ' or partOfSpeech2 == 'VP') and partOfSpeech1 == 'NP':
-             return sentiment2
-         if (partOfSpeech2 == 'DET' or partOfSpeech2 == 'PP' or partOfSpeech2 == 'ADV') and partOfSpeech1 == 'ADJ':
-             return sentiment2
-         if (partOfSpeech2 == 'DET' or partOfSpeech2 == 'ADV') and partOfSpeech1 == 'ADV':
-             return sentiment2
-         if (partOfSpeech2 == 'ADV' or partOfSpeech2 == 'NP') and partOfSpeech1 == 'PP':
-             return sentiment2
-         if (partOfSpeech2 == 'NP') and partOfSpeech1 == 'NP':
-             return sentiment2
-	# print "Applying the rules"
+
+
+def parseTree(s):
+    s = [x.strip() for x in s.replace('\r\n', ' ').split(' ')
+        if x]
+
+    new_s =''
+    for word in s:
+        if word.startswith('('):
+            new_s += '{"' + word[1:] + '": ['
+        else:
+            new_s += '"' + word.replace(')','') + '"' + ']}, ' * word.count(')')
+
+    tree = eval(new_s[:-2].replace(', }', '}'))
+    return tree
+
 
 def getSentiment(sentence, dependencies, stype):
-    # pp.pprint(sentence)
-    if type(sentence) is str:
-		if sentence in pos_words:
-			sentiment = "+"
-		elif sentence in neg_words:
-			sentiment = "-"
-		else:
-			sentiment = "="
-		return sentence, sentiment, stype
+    if isinstance(sentence, str):
+        if sentence in pos_words:
+            sentiment = "+"
+        elif sentence in neg_words:
+            sentiment = "-"
+        else:
+            sentiment = "="
+        return sentence, sentiment, stype
 
     n = ''
     t = '='
@@ -115,161 +102,92 @@ def getSentiment(sentence, dependencies, stype):
                 headKey = key62
             else:
                 for d in dependencies:
+
                     if d['governorGloss'] == n and d['dependentGloss'] == m:
                         m = n
                         t = applyRules(headKey, t, key62, e, 'pre-head')
-                        # print t
+
                     if d['governorGloss'] == m and d['dependentGloss'] == n:
                         t = applyRules(headKey, t, key62, e, 'post-head')
-                        # print t
                         headKey = key62
-                    if ((d['governorGloss'] == n and d['dependentGloss'] == m) or (d['governorGloss'] == m and d['dependentGloss'] == n)) and d['dep'] == 'dobj':
-                    	directdep = 1
+
+                    if d['dep'] == 'dobj' and (
+                        (d['governorGloss'] == n
+                            and d['dependentGloss'] == m)
+                        or (d['governorGloss'] == m
+                            and d['dependentGloss'] == n)):
+                       directdep = 1
+
                     else:
-                    	directdep = 0
-                    # print directdep
+                       directdep = 0
         headKey = key
     return m, t, headKey
 
 
-
-
-
 if __name__ == "__main__":
-    pp = pprint.PrettyPrinter(indent=4)
 
     nlp = StanfordCoreNLP('http://localhost:9000')
 
-    print len(nokia_neg)
-    print len(nokia_pos)
-
-    # print len(rt_neg)
-    # print len(rt_pos)
-
     countNeg = 0
     countPos = 0
-    count = 0
+    total_count = 0
 
-    for x in nokia_neg:
-        count += 1
-        print "Sentence ", count
-        output = nlp.annotate(
-            text = x.lower(),
-            properties={
-              'annotators': 'tokenize,ssplit,pos,depparse,parse',
-              'outputFormat': 'json'
-            }
-        )
-        if "CoreNLP request timed out" in output:
-            print("CoreNLP request timed out. Your document may be too long.")
-        else:
-            sampleTree = output['sentences'][0]['parse']
-            finalTree = parseTree(sampleTree)
-            # pp.pprint(finalTree)
-            head,e, types = getSentiment(finalTree, output['sentences'][0]['basicDependencies'], 'ROOT' )
-            # print head
-            # print 'final sentiment: ', e
+    for data_set in [nokia_neg, nokia_pos, rt_neg, rt_pos]:
+        for sentence in data_set:
+            total_count += 1
+
+            output = nlp.annotate(
+                text = sentence.lower(),
+                properties={
+                  'annotators': 'tokenize,ssplit,pos,depparse,parse',
+                  'outputFormat': 'json'
+                }
+            )
+
+            # Sleep for 2 seconds on server timeout
+            while isinstance(output, str):
+                time.sleep(1)
+                output = nlp.annotate(
+                    text = sentence.lower(),
+                    properties={
+                      'annotators': 'tokenize,ssplit,pos,depparse,parse',
+                      'outputFormat': 'json'
+                    }
+                )
+
+            finalTree = parseTree(output['sentences'][0]['parse'])
+
+            head, e, types = getSentiment(
+                finalTree,
+                output['sentences'][0]['basicDependencies'],
+                'ROOT'
+            )
+
             if e == '-':
                 countNeg += 1
-            # print types
-
-    for x in nokia_pos:
-        count += 1
-        print "Sentence ", count
-        output = nlp.annotate(
-            text = x.lower(),
-            properties={
-              'annotators': 'tokenize,ssplit,pos,depparse,parse',
-              'outputFormat': 'json'
-            }
-        )
-        if "CoreNLP request timed out" in output:
-            print("CoreNLP request timed out. Your document may be too long.")
-        else:
-            sampleTree = output['sentences'][0]['parse']
-            finalTree = parseTree(sampleTree)
-            # pp.pprint(finalTree)
-            head,e, types = getSentiment(finalTree, output['sentences'][0]['basicDependencies'], 'ROOT' )
-            # print head
-            # print 'final sentiment: ', e
-            if e == '+':
+            elif e == '+':
                 countPos += 1
 
-    # for x in rt_neg:
-    # 	count += 1
-    #     print "Sentence ", count
-    #     output = nlp.annotate(
-    #         text = x.lower(),
-    #         properties={
-    #           'annotators': 'tokenize,ssplit,pos,depparse,parse',
-    #           'outputFormat': 'json'
-    #         }
-    #     )
-        if "CoreNLP request timed out" in output:
-            print("CoreNLP request timed out. Your document may be too long.")
-        else:
-            sampleTree = output['sentences'][0]['parse']
-            finalTree = parseTree(sampleTree)
-            # pp.pprint(finalTree)
-            head,e, types = getSentiment(finalTree, output['sentences'][0]['basicDependencies'], 'ROOT' )
-            # print head
-            # print 'final sentiment: ', e
-            if e == '-':
-                countNeg += 1
-            # print types
-    
-    # for x in rt_pos:
-    # 	count += 1
-    #     print "Sentence ", count
-    #     output = nlp.annotate(
-    #         text = x.lower(),
-    #         properties={
-    #           'annotators': 'tokenize,ssplit,pos,depparse,parse',
-    #           'outputFormat': 'json'
-    #         }
-    #     )
-    #     if "CoreNLP request timed out" in output:
-    #         print("CoreNLP request timed out. Your document may be too long.")
-    #     else:
-    #         sampleTree = output['sentences'][0]['parse']
-    #         finalTree = parseTree(sampleTree)
-    #         # pp.pprint(finalTree)
-    #         head,e, types = getSentiment(finalTree, output['sentences'][0]['basicDependencies'], 'ROOT' )
-    #         # print head
-    #         # print 'final sentiment: ', e
-    #         if e == '+':
-    #             countPos += 1
-
-    print "negative correct", countNeg
-    print "positive correct", countPos
-    # print 'negative reviews:  ', len(rt_neg)
-    # print 'positive reviews:  ', len(rt_pos)
-    # print 'percent n correct: ', float(countNeg/float(len(rt_neg)))
-    # print 'percent p correct: ', float(countPos/float(len(rt_pos)))
-    print 'negative reviews:  ', len(nokia_neg)
-    print 'positive reviews:  ', len(nokia_pos)
-    print 'percent n correct: ', float(countNeg/float(len(nokia_neg)))
-    print 'percent p correct: ', float(countPos/float(len(nokia_pos)))
-
-    output = nlp.annotate(
-        text=InputReader(INPUT_FILES).read()[0],  # Use only the 1st
-        # text = 'Clinton defeated Dole',
-        # text = 'this is one of the nicest phones nokia has made .'.lower(),
-        # text = 'Sam eats red meat.'.lower(),
-        # text = 'the senators supporting the leader failed to praise his hopeless HIV prevention program',
-        properties={
-          'annotators': 'tokenize,ssplit,pos,depparse,parse',
-          'outputFormat': 'json'
-        }
+    print(
+        "Negative correct:  {}\n"
+        "Positive correct:  {}\n"
+        "Negative reviews:  {}\n"
+        "Positive reviews:  {}\n"
+        "Percent n correct: {}\n"
+        "Percent p correct: {}\n"
+        "Pegative reviews:  {}\n"
+        "Positive reviews:  {}\n"
+        "Percent n correct: {}\n"
+        "Percent p correct: {}\n".format(
+            countNeg,
+            countPos,
+            len(rt_neg),
+            len(rt_pos),
+            float(countNeg/float(len(rt_neg))),
+            float(countPos/float(len(rt_pos))),
+            len(nokia_neg),
+            len(nokia_pos),
+            float(countNeg/float(len(nokia_neg))),
+            float(countPos/float(len(nokia_pos))),
+        )
     )
-    types = ''
-    if "CoreNLP request timed out" in output:
-        print("CoreNLP request timed out. Your document may be too long.")
-    else:
-        sampleTree = output['sentences'][0]['parse']
-        finalTree = parseTree(sampleTree)
-        pp.pprint(finalTree)
-        head,e, types = getSentiment(finalTree, output['sentences'][0]['basicDependencies'], 'ROOT' )
-        print head
-        print 'final sentiment: ', e
-        print types
