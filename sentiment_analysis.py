@@ -1,6 +1,9 @@
 import time
+import pprint
 
 from pycorenlp import StanfordCoreNLP
+
+pp = pprint.PrettyPrinter(indent=4)
 
 with open('Lexicons/positive-words.txt', 'r') as f:
     pos_words = [line.strip() for line in f]
@@ -9,10 +12,10 @@ with open('Lexicons/negative-words.txt', 'r') as f:
     neg_words = [line.strip() for line in f]
 
 with open('Lexicons/nokia-pos.txt', 'r') as f:
-    nokia_pos = [line.strip() for line in f]
+    nokia_pos = [line.strip().decode('utf-8','ignore').encode("utf-8") for line in f]
 
 with open('Lexicons/nokia-neg.txt', 'r') as f:
-    nokia_neg = [line.strip() for line in f]
+    nokia_neg = [line.strip().decode('utf-8','ignore').encode("utf-8") for line in f]
 
 with open('Lexicons/rt-polarity-pos.txt', 'r') as f:
     rt_pos = [line.strip().decode('utf-8','ignore').encode("utf-8") for line in f]
@@ -123,6 +126,48 @@ def getSentiment(sentence, dependencies, stype):
         headKey = key
     return m, t, headKey
 
+def findPercentage(dataset, sentiment):
+    total_count = 0
+    correct = 0
+    opposite = 0
+    neutral = 0
+    for sentence in dataset:
+        total_count += 1
+        print total_count
+        output = nlp.annotate(
+            text = sentence.lower(),
+            properties={
+              'annotators': 'tokenize,ssplit,pos,depparse,parse',
+              'outputFormat': 'json'
+            }
+        )
+        if "CoreNLP request timed out" in output:
+            print("CoreNLP request timed out. Your document may be too long.")
+        else:
+            finalTree = parseTree(output['sentences'][0]['parse'])
+
+            head, e, types = getSentiment(
+                finalTree,
+                output['sentences'][0]['basicDependencies'],
+                'ROOT'
+            )
+
+            if sentiment == '+':
+                if e == '+':
+                    correct += 1
+                elif e == '-':
+                    opposite += 1
+                else:
+                    neutral += 1
+            if sentiment == '-':
+                if e == '-':
+                    correct += 1
+                elif e == '+':
+                    opposite += 1
+                else:
+                    neutral += 1
+    return correct, opposite, neutral
+
 
 if __name__ == "__main__":
 
@@ -132,62 +177,99 @@ if __name__ == "__main__":
     countPos = 0
     total_count = 0
 
-    for data_set in [nokia_neg, nokia_pos, rt_neg, rt_pos]:
-        for sentence in data_set:
-            total_count += 1
+    nokiaTN, nokiaFP, nokiaNegNeutral= findPercentage(nokia_neg,'-')
+    nokiaTP, nokiaFN, nokiaPosNeutral = findPercentage(nokia_pos,'+')
+    rtTN, rtFP, rtNegNeutral = findPercentage(rt_neg,'-')
+    rtTP, rtFN, rtPosNeutral = findPercentage(rt_pos,'+')
 
-            output = nlp.annotate(
-                text = sentence.lower(),
-                properties={
-                  'annotators': 'tokenize,ssplit,pos,depparse,parse',
-                  'outputFormat': 'json'
-                }
-            )
+    totalFP = nokiaFP + rtFP
+    totalFN = nokiaFN + rtFN
+    totalTP = nokiaTP + rtTP
+    totalTN = nokiaTN + rtTN
+    totalNegNeutral = nokiaNegNeutral + rtNegNeutral
+    totalPosNeutral = nokiaPosNeutral + rtPosNeutral
 
-            # Sleep for 2 seconds on server timeout
-            while isinstance(output, str):
-                time.sleep(1)
-                output = nlp.annotate(
-                    text = sentence.lower(),
-                    properties={
-                      'annotators': 'tokenize,ssplit,pos,depparse,parse',
-                      'outputFormat': 'json'
-                    }
-                )
+    nokiaAccuracy = float((nokiaTP + nokiaTN)/float((nokiaTP + nokiaFP + nokiaTN + nokiaFN)))
+    nokiaPrecision = float(nokiaTP/float(nokiaTP + nokiaFP))
+    nokiaRecall = float(nokiaTP/float(nokiaTP + nokiaFN))
+    nokiaFScore = float((2*nokiaRecall*nokiaPrecision)/(nokiaRecall + nokiaPrecision))
 
-            finalTree = parseTree(output['sentences'][0]['parse'])
+    rtAccuracy = float((rtTP + rtTN)/float((rtTP + rtFP + rtTN + rtFN)))
+    rtPrecision = float(rtTP/float(rtTP + rtFP))
+    rtRecall = float(rtTP/float(rtTP + rtFN))
+    rtFScore = float((2*rtRecall*rtPrecision)/(rtRecall + rtPrecision))
 
-            head, e, types = getSentiment(
-                finalTree,
-                output['sentences'][0]['basicDependencies'],
-                'ROOT'
-            )
+    totalAccuracy = float((totalTP + totalTN)/float((totalTP + totalFP + totalTN + totalFN)))
+    totalPrecision = float(totalTP/float(totalTP + totalFP))
+    totalRecall = float(totalTP/float(totalTP + totalFN))
+    totalFScore = float((2*totalRecall*totalPrecision)/(totalRecall + totalPrecision))
 
-            if e == '-':
-                countNeg += 1
-            elif e == '+':
-                countPos += 1
+    print "Nokia negative: ", len(nokia_neg)
+    print "Nokia positive: ", len(nokia_pos)
+    print "Nokia True Negative: ", nokiaTN
+    print "Nokia True Positive: ", nokiaTP
+    print "Nokia False Negative: ", nokiaFN
+    print "Nokia False Positive: ", nokiaFP
+    print "Nokia Negative - Neutral:", nokiaNegNeutral
+    print "Nokia Positive - Neutral:", nokiaPosNeutral
+    print "Accuracy: ", nokiaAccuracy
+    print "Precision: ", nokiaPrecision
+    print "Recall: ", nokiaRecall
+    print "F-score: ", nokiaFScore
+    print "Percent n correct: ", float(nokiaTN/float(len(nokia_neg)))
+    print "Percent p correct: ", float(nokiaTP/float(len(nokia_pos)))
+    print "======================================="
+    print "RT negative: ", len(rt_neg)
+    print "RT positive: ", len(rt_pos)
+    print "RT True Negative: ", rtTN
+    print "RT True Positive: ", rtTP
+    print "RT False Negative: ", rtFN
+    print "RT False Positive: ", rtFP
+    print "RT Negative - Neutral:", rtNegNeutral
+    print "RT Positive - Neutral:", rtPosNeutral
+    print "Accuracy: ", rtAccuracy
+    print "Precision: ", rtPrecision
+    print "Recall: ", rtRecall
+    print "F-score: ", rtFScore
+    print "Percent n correct: ", float(rtTN/float(len(rt_neg)))
+    print "Percent p correct: ", float(rtTP/float(len(rt_pos)))
+    print "======================================="
+    print "Total negative: ", len(total_neg)
+    print "Total positive: ", len(total_pos)
+    print "Total True Negative: ", totalTN
+    print "Total True Positive: ", totalTP
+    print "Total False Negative: ", totalFN
+    print "Total False Positive: ", totalFP
+    print "Total Negative - Neutral:", totalNegNeutral
+    print "Total Positive - Neutral:", totalPosNeutral
+    print "Accuracy: ", totalAccuracy
+    print "Precision: ", totalPrecision
+    print "Recall: ", totalRecall
+    print "F-score: ", totalFScore
+    print "Percent n correct: ", float(totalTN/float(len(total_neg)))
+    print "Percent p correct: ", float(totalTP/float(len(total_pos)))
 
-    print(
-        "Negative correct:  {}\n"
-        "Positive correct:  {}\n"
-        "Negative reviews:  {}\n"
-        "Positive reviews:  {}\n"
-        "Percent n correct: {}\n"
-        "Percent p correct: {}\n"
-        "Pegative reviews:  {}\n"
-        "Positive reviews:  {}\n"
-        "Percent n correct: {}\n"
-        "Percent p correct: {}\n".format(
-            countNeg,
-            countPos,
-            len(rt_neg),
-            len(rt_pos),
-            float(countNeg/float(len(rt_neg))),
-            float(countPos/float(len(rt_pos))),
-            len(nokia_neg),
-            len(nokia_pos),
-            float(countNeg/float(len(nokia_neg))),
-            float(countPos/float(len(nokia_pos))),
-        )
-    )
+
+    # print(
+    #     "Negative correct:  {}\n"
+    #     "Positive correct:  {}\n"
+    #     "Negative reviews:  {}\n"
+    #     "Positive reviews:  {}\n"
+    #     "Percent n correct: {}\n"
+    #     "Percent p correct: {}\n"
+    #     "Pegative reviews:  {}\n"
+    #     "Positive reviews:  {}\n"
+    #     "Percent n correct: {}\n"
+    #     "Percent p correct: {}\n".format(
+    #         # countNeg,
+    #         # countPos,
+    #         # len(rt_neg),
+    #         # len(rt_pos),
+    #         # float(countRTNeg/float(len(rt_neg))),
+    #         # float(countRTPos/float(len(rt_pos))),
+    #         len(nokia_neg),
+    #         len(nokia_pos),
+    #         float(countNokiaNeg/float(len(nokia_neg))),
+    #         float(countNokiaPos/float(len(nokia_pos))),
+    #     )
+    # )
