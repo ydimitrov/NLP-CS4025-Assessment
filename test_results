@@ -126,3 +126,43 @@ Nokia   (All Data,  Naive Bayes)     Precision (Neg)=0.37 (50/134)
 Nokia   (All Data,  Naive Bayes)     Recall (Neg)=0.62 (50/80)
 Nokia   (All Data,  Naive Bayes)     F-measure (Neg)=0.47
 
+
+Analyser 2 - Nokia only
+
+==============================
+Results
+==============================
+
+Positive
+------------------------------
+
+Total: 193
+Correct: 147
+Incorrect: 46
+Accuracy: 76 %
+Precision: 91 %
+Recall: 76 %
+F-Measure: 83 %
+
+Negative
+------------------------------
+
+Total: 79
+Correct: 36
+Incorrect: 43
+Accuracy: 45 %
+Precision: 78 %
+Recall: 45 %
+F-Measure: 57 %
+
+Sentiment Intensity Analyzer
+------------------------------
+
+Total: 79
+Correct: 38
+Incorrect: 41
+Accuracy: 48 %
+Precision: 77 %
+Recall: 48 %
+F-Measure: 59 %
+
