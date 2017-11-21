@@ -1,4 +1,4 @@
-Analyzer 1
+Analyser 1
 ===========================
 Negative correct:  2353
 Positive correct:  3028
@@ -74,45 +74,55 @@ Percent p correct:  0.367668356264
 =======================================
 
 
-Analyzer 2
-===========================
-
-Total (Pos): 5524
-Correct (Pos): 2559
-Incorrect (Pos): 2965
-Accuracy (Pos): 0.46325126719768284
-Precision (Pos): 0.6840417000801925
-Recall (Pos): 0.46325126719768284
-F-Measure (Pos): 0.5524015110631408
+Analyser2
+==============================
+Results
+==============================
 
 
-Total (Neg): 5410
-Correct (Neg): 1925
-Incorrect (Neg): 3485
-Accuracy (Neg): 0.355822550831793
-Precision (Neg): 0.26762129848463784
-Recall (Neg): 0.355822550831793
-F-Measure (Neg): 0.3054828215504245
+Positive
+------------------------------
+
+Total: 5524
+Correct: 2559
+Incorrect: 2965
+Accuracy: 46 %
+Precision: 68 %
+Recall: 46 %
+F-Measure: 55 %
+
+Negative
+------------------------------
+
+Total: 5410
+Correct: 1925
+Incorrect: 3485
+Accuracy: 35 %
+Precision: 66 %
+Recall: 35 %
+F-Measure: 46 %
+
+Sentiment Intensity Analyzer
+------------------------------
+
+Total: 5410
+Correct: 2179
+Incorrect: 3231
+Accuracy: 40 %
+Precision: 69 %
+Recall: 40 %
+F-Measure: 50 %
 
 
 ==============================
 Naive Bayes
 ==============================
-Nokia   (All Data,  Naive Bayes)     Accuracy (All)=0.60 (163/273)
+Nokia   (All Data,  Naive Bayes)     Accuracy (All)=0.58 (159/273)
 
-Nokia   (All Data,  Naive Bayes)     Precision (Pos)=0.79 (112/141)
-Nokia   (All Data,  Naive Bayes)     Recall (Pos)=0.58 (112/193)
-Nokia   (All Data,  Naive Bayes)     F-measure (Pos)=0.67
-Nokia   (All Data,  Naive Bayes)     Precision (Neg)=0.39 (51/132)
-Nokia   (All Data,  Naive Bayes)     Recall (Neg)=0.64 (51/80)
-Nokia   (All Data,  Naive Bayes)     F-measure (Neg)=0.48
+Nokia   (All Data,  Naive Bayes)     Precision (Pos)=0.78 (109/139)
+Nokia   (All Data,  Naive Bayes)     Recall (Pos)=0.56 (109/193)
+Nokia   (All Data,  Naive Bayes)     F-measure (Pos)=0.66
+Nokia   (All Data,  Naive Bayes)     Precision (Neg)=0.37 (50/134)
+Nokia   (All Data,  Naive Bayes)     Recall (Neg)=0.62 (50/80)
+Nokia   (All Data,  Naive Bayes)     F-measure (Neg)=0.47
 
-
-Films  (Test Data, Naive Bayes)  Accuracy (All)=0.78 (824/1058)
-
-Films  (Test Data, Naive Bayes)  Precision (Pos)=0.76 (395/523)
-Films  (Test Data, Naive Bayes)  Recall (Pos)=0.79 (395/501)
-Films  (Test Data, Naive Bayes)  F-measure (Pos)=0.77
-Films  (Test Data, Naive Bayes)  Precision (Neg)=0.80 (429/535)
-Films  (Test Data, Naive Bayes)  Recall (Neg)=0.77 (429/557)
-Films  (Test Data, Naive Bayes)  F-measure (Neg)=0.79
